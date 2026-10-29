@@ -5,7 +5,10 @@ exports.config = {
     // ====================
     // WebdriverIO supports running e2e tests as well as unit and component tests.
     runner: 'local',
-    port: 4723,
+    //port: 4723,
+    user: process.env.BROWSERSTACK_USERNAME,
+    key: process.env.BROWSERSTACK_ACCESS_KEY,
+    hostname: 'hub.browserstack.com',
     //
     // ==================
     // Specify Test Files
@@ -44,13 +47,13 @@ exports.config = {
     // and 30 processes will get spawned. The property handles how many capabilities
     // from the same test should run tests.
     //
-    maxInstances: 10,
+    maxInstances: 1,
     //
     // If you have trouble getting all important capabilities together, check out the
     // Sauce Labs platform configurator - a great tool to configure your capabilities:
     // https://saucelabs.com/platform/platform-configurator
     //
-    capabilities: [{
+    /*capabilities: [{
         // capabilities for local Appium web tests on an Android Emulator
         platformName: 'Android',
         "appium:deviceName": "Pixel 4 API 33",          // nombre de tu emulador (adb devices)
@@ -78,6 +81,27 @@ exports.config = {
             buildName: 'Build Alarmas',
             sessionName: 'Prueba APK Alarmas',
             local: false  // si no necesitas BrowserStack Local
+        }
+    }],*/
+    capabilities: [{
+        platformName: 'Android',
+
+        // Appium para Android
+        'appium:automationName': 'UiAutomator2',
+        'appium:newCommandTimeout': 300,
+        'appium:autoGrantPermissions': true,
+
+        // Dispositivo real de BrowserStack
+        'bstack:options': {
+            deviceName: 'Google Pixel 10',
+            platformVersion: '16.0',
+
+            projectName: 'Proyecto QA',
+            buildName: `Jenkins ${process.env.JOB_NAME || 'Appium'} #${process.env.BUILD_NUMBER || 'local'}`,
+            sessionName: 'Prueba APK Alarmas',
+
+            debug: true,
+            networkLogs: true
         }
     }],
 
@@ -128,7 +152,13 @@ exports.config = {
     // Services take over a specific job you don't want to take care of. They enhance
     // your test setup with almost no effort. Unlike plugins, they don't add new
     // commands. Instead, they hook themselves up into the test process.
-    services: ['appium'],
+    //services: ['appium'],
+    services: [
+        ['browserstack', {
+            app: 'bs://578f9832d4644271a3aa3e00dc27f7c5690898bf',
+            browserstackLocal: false
+        }]
+    ],
 
     // Framework you want to run your specs with.
     // The following are supported: Mocha, Jasmine, and Cucumber
